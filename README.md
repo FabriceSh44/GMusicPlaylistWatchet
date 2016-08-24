@@ -7,8 +7,11 @@ Run PlaylistScraperRunner.py [path to config.ini]
 Content of config.ini :
 
 [GmailAccountInfo]
+
 gmailEmail = *gmail account*
+
 gmailAppPassword = *app password*
 
 [Persistence]
+
 dumpFile = *dump file destination*
