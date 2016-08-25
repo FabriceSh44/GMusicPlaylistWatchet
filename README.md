@@ -1,5 +1,5 @@
 # GMusicPlaylistWatcher
-I've discovered that I lost music in my playlist and I want to know which one.
+Persist google music playlist in a local file and compare the previous run to current playlist state
 
 Usage :
 
