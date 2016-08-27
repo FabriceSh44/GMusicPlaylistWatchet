@@ -18,11 +18,13 @@ def dump_file(file, playlist_list):
 
 def send_report_by_email(compare_report, email_address):
     print('Sending email')
-    body = 'Nothing found'
-    if len(compare_report)!=0:
+    body = 'No track lost :)'
+    nb_loss = len(compare_report)
+    if nb_loss != 0:
         body = '\n'.join(compare_report)
 
-    pymail.send_mail(body, '[Gmusic]Report', False, email_address)
+    pymail.send_mail(body, '[GMPW]{0} track(s) lost'.format(nb_loss), False, email_address)
+
 
 def get_playlist_from_api(api):
     print('Connection OK. Retrieving playlist from google music')
@@ -72,6 +74,8 @@ def compare_playlist(playlist_list_from_api, playlist_list_from_file):
                             message = 'Playlist {0} : missing {1}'.format(playlist_api.name, ';'.join(track))
                             report.append(message)
                             print(message)
+    if len(report) == 0:
+        print('No track lost')
     return report
 
 
@@ -84,10 +88,14 @@ else:
 print('Loading configuration from {0}'.format(config_file))
 config.read(config_file)
 
+google_credential = 'GmailAccountInfo'
+if google_credential not in config:
+    raise ValueError("Config file {0} doesn't contains {1} tag".format(config_file, google_credential))
+
 api = Mobileclient()
 
-email_address = config['GmailAccountInfo']['gmailEmail']
-email_pass = config['GmailAccountInfo']['gmailAppPassword']
+email_address = config[google_credential]['gmailEmail']
+email_pass = config[google_credential]['gmailAppPassword']
 print('Connecting to gmusic api with {0}'.format(email_address))
 logged_in = api.login(email_address, email_pass, Mobileclient.FROM_MAC_ADDRESS)
 
