@@ -1,7 +1,7 @@
 import configparser
 import os
-import sys
 
+import sys
 from gmusicapi import Mobileclient
 
 import Playlist
@@ -13,7 +13,7 @@ def dump_file(file, playlist_list):
     with open(file, 'w') as fwrite:
         for playlist in playlist_list:
             for track in playlist.track_list:
-                fwrite.write('{0};{1}{2}'.format(playlist.name, ';'.join(track), '\n'))
+                fwrite.write('{0};{1};{2};{3};{4}'.format(playlist.name, track.album, track.artist, track.title, '\n'))
 
 
 def send_report_by_email(compare_report, email_address):
@@ -68,10 +68,10 @@ def compare_playlist(playlist_list_from_api, playlist_list_from_file):
     for playlist_api in playlist_list_from_api:
         for playlist_file in playlist_list_from_file:
             if playlist_api.name == playlist_file.name:
-                if len(playlist_api.track_list) < len(playlist_file.track_list):
+                if set(playlist_api.track_list) != set(playlist_file.track_list):
                     for track in playlist_file.track_list:
                         if not playlist_api.has_track(track):
-                            message = 'Playlist {0} : missing {1}'.format(playlist_api.name, ';'.join(track))
+                            message = 'Playlist {0} : missing {1}'.format(playlist_api.name, track)
                             report.append(message)
                             print(message)
     if len(report) == 0:
