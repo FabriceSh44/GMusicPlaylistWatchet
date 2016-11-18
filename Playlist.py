@@ -14,11 +14,14 @@ class Playlist:
         return track_to_find in self.track_list
 
 
+SEPARATOR = ';'
+
+
 class Track:
     def __init__(self, album, artist, title):
-        self.album = album
-        self.artist = artist
-        self.title = title
+        self.album = album.replace(SEPARATOR, '')
+        self.artist = artist.replace(SEPARATOR, '')
+        self.title = title.replace(SEPARATOR, '')
 
     def __key(self):
         return (self.album, self.artist, self.title)
@@ -30,5 +33,4 @@ class Track:
         return hash(self.__key())
 
     def __str__(self):
-        return '{0}-{1}-{2}'.format(self.title,self.artist,self.album)
-
+        return '{0}-{1}-{2}'.format(self.title, self.artist, self.album)

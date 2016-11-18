@@ -13,7 +13,7 @@ def dump_file(file, playlist_list):
     with open(file, 'w') as fwrite:
         for playlist in playlist_list:
             for track in playlist.track_list:
-                fwrite.write('{0};{1};{2};{3};{4}'.format(playlist.name, track.album, track.artist, track.title, '\n'))
+                fwrite.write('{0}{5}{1}{5}{2}{5}{3}{5}{4}'.format(playlist.name, track.album, track.artist, track.title, '\n',Playlist.SEPARATOR))
 
 
 def send_report_by_email(compare_report, email_address):
@@ -50,7 +50,7 @@ def get_playlist_list_from_file(persisted_file):
         print('Get playlist from {0}'.format(persisted_file))
         with open(persisted_file, 'r') as fread:
             for line in fread:
-                splitted_line = line.strip().split(';')
+                splitted_line = line.strip().split(Playlist.SEPARATOR)
                 if cur_name != splitted_line[0]:
                     cur_name = splitted_line[0]
                     cur_playlist = Playlist.Playlist(cur_name)
