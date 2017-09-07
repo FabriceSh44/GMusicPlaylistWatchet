@@ -3,6 +3,7 @@ import os
 
 import sys
 from gmusicapi import Mobileclient
+import distance
 
 import Playlist
 import pymail
@@ -48,14 +49,13 @@ def get_playlist_list_from_file(persisted_file):
     cur_name = ''
     if os.path.exists(persisted_file):
         print('Get playlist from {0}'.format(persisted_file))
-        with open(persisted_file, 'r') as fread:
-            for line in fread:
-                splitted_line = line.strip().split(Playlist.SEPARATOR)
-                if cur_name != splitted_line[0]:
-                    cur_name = splitted_line[0]
-                    cur_playlist = Playlist.Playlist(cur_name)
-                    playlist_list.append(cur_playlist)
-                cur_playlist.add_track(splitted_line[1], splitted_line[2], splitted_line[3])
+        splitted_lines = [x.strip().split(Playlist.SEPARATOR) for x in open(persisted_file, 'r')]
+        for splitted_line in splitted_lines:
+            if cur_name != splitted_line[0]:
+                cur_name = splitted_line[0]
+                cur_playlist = Playlist.Playlist(cur_name)
+                playlist_list.append(cur_playlist)
+            cur_playlist.add_track(splitted_line[1], splitted_line[2], splitted_line[3])
     else:
         print("File {0} doesn't exist".format(persisted_file))
 
