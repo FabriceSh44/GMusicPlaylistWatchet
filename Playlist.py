@@ -19,7 +19,7 @@ class Playlist:
             sum_levenshtein = sum([distance.levenshtein(x, y) * z for x,y,z in
              [(track.album, track_to_find.album , 1),(track.artist,track_to_find.artist, 1),(track.title,track_to_find.title,3)]])
             min_lev = min([sum_levenshtein,min_lev])
-        if min_lev<5:
+        if min_lev<10:
             return True
         else:
             return False

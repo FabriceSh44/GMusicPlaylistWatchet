@@ -72,6 +72,13 @@ def compare_playlist(playlist_list_from_api, playlist_list_from_file):
                     for track in playlist_file.track_list:
                         if not playlist_api.has_track(track):
                             message = 'Playlist {0} : missing {1}'.format(playlist_api.name, track)
+                            result = api.search("{} {}".format(track.title, track.artist ))
+                            replacement_track = result['song_hits'][0].track
+                            artist = replacement_track["artist"]
+                            title = replacement_track["title"]
+                            answer = input("Wanna replace this missing song by {}-{} found ?(Y/n)".format(artist,title)).lower()
+                            if answer!='n':
+                                api.add_songs_to_playlist()
                             report.append(message)
                             print(message)
     if len(report) == 0:
