@@ -3,7 +3,6 @@ import os
 
 import sys
 from gmusicapi import Mobileclient
-import distance
 
 import Playlist
 import pymail
@@ -26,13 +25,13 @@ def send_report_by_email(compare_report, email_address):
     if nb_loss != 0:
         body = '\n'.join(compare_report)
 
-    pymail.send_mail(body, '[GMPW]{0} track(s) lost'.format(nb_loss), False, email_address)
+    pymail.send_mail(body, '[GMPW]{} track(s) lost'.format(nb_loss), False, email_address)
 
 
 def get_playlist_from_api(api):
     print('Connection OK. Retrieving playlist from google music')
     user_playlist = api.get_all_user_playlist_contents()
-    print('{0} playlist(s) found'.format(len(user_playlist)))
+    print('{} playlist(s) found'.format(len(user_playlist)))
     playlist_list = []
     for playlist_with_content in user_playlist:
         cur_playlist = Playlist.Playlist(playlist_with_content['name'])
@@ -69,6 +68,7 @@ def compare_playlist(playlist_list_from_api, playlist_list_from_file):
     print('Looking for missing element from api compared to file')
     report = []
     for playlist_api in playlist_list_from_api:
+        print(f"Processing [{playlist_api.name}] playlist..")
         for playlist_file in playlist_list_from_file:
             if playlist_api.name == playlist_file.name:
                 if set(playlist_api.track_list) != set(playlist_file.track_list):
@@ -82,7 +82,7 @@ def compare_playlist(playlist_list_from_api, playlist_list_from_file):
 
 
 def process_discrepancy(playlist_api, report, track):
-    message = 'Playlist {0} : missing {1}'.format(playlist_api.name, track)
+    message = "Playlist [{}]: missing\n{}".format(playlist_api.name, str.center(str(track), 130, " "))
     print(message)
     result = api.search("{} {}".format(track.title, track.artist))
     try:
@@ -94,7 +94,8 @@ def process_discrepancy(playlist_api, report, track):
     else:
         artist = replacement_track["artist"]
         title = replacement_track["title"]
-        answer = input("Wanna replace this missing song by {}-{} found ?(Y/n)".format(artist, title)).lower()
+        answer = input("Wanna replace this missing song by:\n{}\nfound ?(Y/n)".format(
+            str.center(f"{artist}-{title}", 130, " "))).lower()
         if answer != 'n':
             api.add_songs_to_playlist(playlist_api.id, replacement_track["storeId"])
 
@@ -110,7 +111,7 @@ config.read(config_file)
 
 google_credential = 'GmailAccountInfo'
 if google_credential not in config:
-    raise ValueError("Config file {0} doesn't contains {1} tag".format(config_file, google_credential))
+    raise ValueError(f"Config file {config_file} doesn't contains {google_credential} tag")
 
 api = Mobileclient()
 
