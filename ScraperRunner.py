@@ -14,7 +14,9 @@ def dump_file(file, playlist_list):
     with open(file, 'w') as fwrite:
         for playlist in playlist_list:
             for track in playlist.track_list:
-                fwrite.write('{0}{5}{1}{5}{2}{5}{3}{5}{4}'.format(playlist.name, track.album, track.artist, track.title, '\n',Playlist.SEPARATOR))
+                fwrite.write(
+                    '{0}{5}{1}{5}{2}{5}{3}{5}{4}'.format(playlist.name, track.album, track.artist, track.title, '\n',
+                                                         Playlist.SEPARATOR))
 
 
 def send_report_by_email(compare_report, email_address):
@@ -34,6 +36,7 @@ def get_playlist_from_api(api):
     playlist_list = []
     for playlist_with_content in user_playlist:
         cur_playlist = Playlist.Playlist(playlist_with_content['name'])
+        cur_playlist.id = playlist_with_content['id']
         tracks_list = playlist_with_content['tracks']
         for track in tracks_list:
             if 'track' in track:
@@ -71,19 +74,29 @@ def compare_playlist(playlist_list_from_api, playlist_list_from_file):
                 if set(playlist_api.track_list) != set(playlist_file.track_list):
                     for track in playlist_file.track_list:
                         if not playlist_api.has_track(track):
-                            message = 'Playlist {0} : missing {1}'.format(playlist_api.name, track)
-                            result = api.search("{} {}".format(track.title, track.artist ))
-                            replacement_track = result['song_hits'][0].track
-                            artist = replacement_track["artist"]
-                            title = replacement_track["title"]
-                            answer = input("Wanna replace this missing song by {}-{} found ?(Y/n)".format(artist,title)).lower()
-                            if answer!='n':
-                                api.add_songs_to_playlist()
-                            report.append(message)
-                            print(message)
+                            process_discrepancy(playlist_api, report, track)
+
     if len(report) == 0:
-        print('No track lost')
+        print('No track lost or enough retrieved')
     return report
+
+
+def process_discrepancy(playlist_api, report, track):
+    message = 'Playlist {0} : missing {1}'.format(playlist_api.name, track)
+    print(message)
+    result = api.search("{} {}".format(track.title, track.artist))
+    try:
+        replacement_track = result['song_hits'][0]['track']
+    except:
+        replacement_track = None
+    if replacement_track is None:
+        report.append(message)
+    else:
+        artist = replacement_track["artist"]
+        title = replacement_track["title"]
+        answer = input("Wanna replace this missing song by {}-{} found ?(Y/n)".format(artist, title)).lower()
+        if answer != 'n':
+            api.add_songs_to_playlist(playlist_api.id, replacement_track["storeId"])
 
 
 config = configparser.ConfigParser()

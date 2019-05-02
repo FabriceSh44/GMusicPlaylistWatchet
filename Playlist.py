@@ -1,9 +1,11 @@
 import distance
 
+
 class Playlist:
     def __init__(self, name):
         self.name = name
         self.track_list = []
+        self.id = -1
         pass
 
     def add_track(self, album, artist, title):
@@ -15,13 +17,18 @@ class Playlist:
     def has_track(self, track_to_find):
         min_lev = 100
         for track in self.track_list:
-            #name of songs can slightly change and still be in the playlist
-            sum_levenshtein = sum([distance.levenshtein(x, y) * z for x,y,z in
-             [(track.album, track_to_find.album , 1),(track.artist,track_to_find.artist, 1),(track.title,track_to_find.title,3)]])
-            min_lev = min([sum_levenshtein,min_lev])
-        if min_lev<10:
+            # name of songs can slightly change and still be in the playlist
+            if track.title == track_to_find.title:
+                return True
+            sum_levenshtein = sum([distance.levenshtein(x, y) * z for x, y, z in
+                                   [(track.artist, track_to_find.artist, 3),
+                                    (track.title, track_to_find.title, 8)]])
+            min_lev = min([sum_levenshtein, min_lev])
+
+        if min_lev < 40:
             return True
         else:
+            print('For {} - min_lev = {}'.format(track_to_find, min_lev))
             return False
 
 
