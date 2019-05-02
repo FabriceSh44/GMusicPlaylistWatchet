@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 .idea/
+bin/
 env/
 build/
 develop-eggs/
@@ -90,3 +91,4 @@ ENV/
 # Rope project settings
 .ropeproject
 .DS_Store
+pyvenv.cfg
